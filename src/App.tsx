@@ -47,7 +47,7 @@ function App() {
               AI Chemistry Virtual Lab
             </Typography>
             <Typography variant="caption" sx={{ opacity: 0.7 }}>
-              Powered by LangChain & GPT-4
+              Powered by LangChain & OpenAI Models
             </Typography>
           </Toolbar>
         </AppBar>

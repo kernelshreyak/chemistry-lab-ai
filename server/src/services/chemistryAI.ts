@@ -11,7 +11,7 @@ function getLLM(): ChatOpenAI {
             throw new Error('Please set a valid OPENAI_API_KEY in server/.env file');
         }
         llm = new ChatOpenAI({
-            modelName: 'gpt-4',
+            modelName: 'gpt-4.1',
             temperature: 0.3,
             openAIApiKey: process.env.OPENAI_API_KEY,
         });
@@ -122,5 +122,53 @@ Return ONLY valid JSON in this exact format:
     } catch (error) {
         console.error('Error getting compound details:', error);
         return null;
+    }
+}
+
+export async function generateCompoundDescription(compound: {
+    name: string;
+    iupacName?: string;
+    smiles: string;
+    formula?: string
+}): Promise<string> {
+    try {
+        const prompt = `Provide a comprehensive description of the chemical compound "${compound.name}" (${compound.iupacName || 'N/A'}).
+
+Compound Information:
+- Common Name: ${compound.name}
+- IUPAC Name: ${compound.iupacName || 'N/A'}
+- Molecular Formula: ${compound.formula || 'N/A'}
+- SMILES: ${compound.smiles}
+
+Please provide a detailed description covering:
+
+**Physical Properties:**
+- Appearance, state, color, odor
+- Melting point, boiling point
+- Density, solubility
+
+**Chemical Properties:**
+- Reactivity and stability
+- pH characteristics
+- Flammability and decomposition
+
+**Storage Requirements:**
+- Temperature and container requirements
+- Safety precautions
+- Shelf life considerations
+
+**Applications and Uses:**
+- Industrial applications
+- Pharmaceutical uses
+- Research applications
+- Consumer products
+
+Format as clear, professional text with sections. Be concise but informative.`;
+
+        const response = await getLLM().invoke(prompt);
+        return response.content as string;
+    } catch (error) {
+        console.error('Error generating compound description:', error);
+        throw new Error('Failed to generate compound description');
     }
 }
