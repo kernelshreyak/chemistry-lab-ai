@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { predictReaction, getCompoundDetails, generate3DStructure } from '../services/chemistryAI.js';
+import { predictReaction, getCompoundDetails, generate3DStructure, generateCompoundDescription } from '../services/chemistryAI.js';
 import { ReactionScenario } from '../types/chemistry.js';
 
 const router = express.Router();
@@ -52,6 +52,23 @@ router.post('/3d-structure', async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error in /3d-structure:', error);
         res.status(500).json({ error: 'Failed to generate 3D structure' });
+    }
+});
+
+// POST /api/reactions/compound-description - Generate AI description of compound
+router.post('/compound-description', async (req: Request, res: Response) => {
+    try {
+        const { name, iupacName, smiles, formula } = req.body;
+
+        if (!name || !smiles) {
+            return res.status(400).json({ error: 'Compound name and SMILES are required' });
+        }
+
+        const description = await generateCompoundDescription({ name, iupacName, smiles, formula });
+        res.json({ description });
+    } catch (error) {
+        console.error('Error in /compound-description:', error);
+        res.status(500).json({ error: 'Failed to generate compound description' });
     }
 });
 
